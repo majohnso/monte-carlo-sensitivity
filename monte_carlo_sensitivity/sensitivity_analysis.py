@@ -3,6 +3,7 @@ from typing import Callable, Tuple, Dict
 import numpy as np
 import pandas as pd
 import scipy
+from scipy.stats import mstats
 
 from .perturbed_run import DEFAULT_NORMALIZATION_FUNCTION, perturbed_run
 
