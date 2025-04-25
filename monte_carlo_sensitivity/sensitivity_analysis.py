@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import scipy
 
-from monte_carlo_sensitivity import default_normalization_function, perturbed_run
+from .perturbed_run import DEFAULT_NORMALIZATION_FUNCTION, perturbed_run
 
 
 def sensitivity_analysis(
@@ -13,7 +13,7 @@ def sensitivity_analysis(
         output_variables: str,
         forward_process: Callable,
         perturbation_process: Callable = np.random.normal,
-        normalization_function: Callable = default_normalization_function,
+        normalization_function: Callable = DEFAULT_NORMALIZATION_FUNCTION,
         n: int = 100,
         perturbation_mean: float = 0,
         perturbation_std: float = None) -> Tuple[pd.DataFrame, Dict]:

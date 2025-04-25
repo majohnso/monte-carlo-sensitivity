@@ -6,7 +6,7 @@ import pandas as pd
 from .repeat_rows import repeat_rows
 from .divide_by_std import divide_by_std
 
-default_normalization_function = divide_by_std
+DEFAULT_NORMALIZATION_FUNCTION = divide_by_std
 
 def perturbed_run(
         input_df: pd.DataFrame,
@@ -14,7 +14,7 @@ def perturbed_run(
         output_variable: str,
         forward_process: Callable,
         perturbation_process: Callable = np.random.normal,
-        normalization_function: Callable = default_normalization_function,
+        normalization_function: Callable = DEFAULT_NORMALIZATION_FUNCTION,
         n: int = 100,
         perturbation_mean: float = 0,
         perturbation_std: float = None,
