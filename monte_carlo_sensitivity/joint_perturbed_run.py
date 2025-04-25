@@ -1,22 +1,44 @@
-from typing import Callable, Dict, Tuple
+from typing import Callable
+
 import numpy as np
 import pandas as pd
-import scipy
-from scipy.stats import mstats
 
-def repeat_rows(df: pd.DataFrame, n: int) -> pd.DataFrame:
-    return pd.DataFrame(np.repeat(df.values, n, axis=0), columns=df.columns)
+from monte_carlo_sensitivity import repeat_rows
+
 
 def joint_perturbed_run(
-        input_df: pd.DataFrame, 
-        input_variable: str, 
-        output_variable: str, 
+        input_df: pd.DataFrame,
+        input_variable: str,
+        output_variable: str,
         forward_process: Callable,
         perturbation_process: Callable = np.random.multivariate_normal,
-        n: int = 1000, 
+        n: int = 100,
         perturbation_mean: float = None,
-        perturbation_cov: float = None,
-        dropna: bool = True) -> pd.DataFrame:
+        perturbation_cov: float = None) -> pd.DataFrame:
+    """
+    Perform a joint perturbed run analysis on input data to evaluate the sensitivity of output variables
+    to perturbations in input variables.
+
+    Parameters:
+        input_df (pd.DataFrame): The input DataFrame containing the input variables.
+        input_variable (str): The name(s) of the input variable(s) to perturb.
+        output_variable (str): The name(s) of the output variable(s) to analyze.
+        forward_process (Callable): A function that processes the input DataFrame and returns a DataFrame
+                                    with output variables.
+        perturbation_process (Callable, optional): A function to generate perturbations. Defaults to
+                                                   np.random.multivariate_normal.
+        n (int, optional): The number of perturbations to generate for each input. Defaults to 100.
+        perturbation_mean (float, optional): The mean of the perturbation distribution. Defaults to None,
+                                             which assumes zero mean.
+        perturbation_cov (float, optional): The covariance matrix of the perturbation distribution. Defaults
+                                            to None, which assumes diagonal covariance based on input standard
+                                            deviations.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the unperturbed inputs, perturbed inputs, perturbations,
+                      unperturbed outputs, perturbed outputs, and standardized perturbations for both inputs
+                      and outputs.
+    """
     # calculate standard deviation of the input variable
 
     n_input = len(input_variable)
@@ -34,6 +56,7 @@ def joint_perturbed_run(
     if perturbation_mean is None:
         perturbation_mean = np.zeros(n_input)
 
+
     # forward process the unperturbed input
     unperturbed_output_df = forward_process(input_df)
     # calculate standard deviation of the output variable
@@ -48,6 +71,7 @@ def joint_perturbed_run(
     unperturbed_output = repeat_rows(unperturbed_output, n)
     # generate input perturbation
     input_perturbation = perturbation_process(perturbation_mean, perturbation_cov, n*len(input_df))
+    print(input_perturbation.shape)
     input_perturbation_std = input_perturbation / input_std
     # copy input for perturbation
     perturbed_input_df = input_df.copy()
@@ -59,7 +83,6 @@ def joint_perturbed_run(
     perturbed_input_df[input_variable] = perturbed_input_df[input_variable] + input_perturbation
     # extract perturbed input
     perturbed_input = perturbed_input_df[input_variable]
-    print(np.sum(perturbed_input_df.Rn == 0))
     # forward process the perturbed input
     perturbed_output_df = forward_process(perturbed_input_df)
     # extract output variable from perturbed output
@@ -80,8 +103,6 @@ def joint_perturbed_run(
     output_perturbation_std.columns = [s+"_perturbation_std" for s in output_variable]
     perturbed_output.columns = [s+"_perturbed" for s in output_variable]
 
-    ids = pd.DataFrame({"id": np.repeat(np.arange(input_df.shape[0]),n)})
-
     results_df = pd.concat([unperturbed_input,
                             input_perturbation_df,
                             input_perturbation_std_df,
@@ -89,10 +110,6 @@ def joint_perturbed_run(
                             unperturbed_output,
                             output_perturbation,
                             output_perturbation_std,
-                            perturbed_output,
-                            ids], axis=1)
+                            perturbed_output], axis=1)
 
-    if dropna:
-        results_df = results_df.dropna()
-
-    return unperturbed_input, perturbed_input_df, perturbed_output_df, results_df
+    return results_df
