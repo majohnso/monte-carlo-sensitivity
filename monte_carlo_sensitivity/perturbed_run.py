@@ -3,8 +3,10 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
-from monte_carlo_sensitivity import default_normalization_function, repeat_rows
+from .repeat_rows import repeat_rows
+from .divide_by_std import divide_by_std
 
+default_normalization_function = divide_by_std
 
 def perturbed_run(
         input_df: pd.DataFrame,

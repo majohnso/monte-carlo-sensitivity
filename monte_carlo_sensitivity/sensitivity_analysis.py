@@ -64,13 +64,7 @@ def sensitivity_analysis(
             # print(len(variable_perturbation_df))
             input_perturbation_std = variable_perturbation_df.input_perturbation_std
             output_perturbation_std = variable_perturbation_df.output_perturbation_std
-            # print(f"measuring correlation for input variable {input_variable} output variable {output_variable} with {len(output_perturbation_std)} perturbations")
-            # print("input_perturbation_std")
-            # print(input_perturbation_std)
-            # print("output_perturbation_std")
-            # print(output_perturbation_std)
             correlation = mstats.pearsonr(input_perturbation_std, output_perturbation_std)[0]
-            # print(f"correlation: {correlation}")
 
             sensitivity_metrics_df = pd.concat([sensitivity_metrics_df, pd.DataFrame([[
                 input_variable,
