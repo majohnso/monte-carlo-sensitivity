@@ -19,6 +19,36 @@ def perturbed_run(
         perturbation_mean: float = 0,
         perturbation_std: float = None,
         dropna: bool = True) -> pd.DataFrame:
+    """
+    Perform a Monte Carlo sensitivity analysis by perturbing an input variable and observing the effect on an output variable.
+
+    Parameters:
+        input_df (pd.DataFrame): The input DataFrame containing the data to be perturbed.
+        input_variable (str): The name of the input variable to perturb.
+        output_variable (str): The name of the output variable to analyze.
+        forward_process (Callable): A function that processes the input DataFrame and returns a DataFrame with the output variable.
+        perturbation_process (Callable, optional): A function to generate perturbations (default: np.random.normal).
+        normalization_function (Callable, optional): A function to normalize perturbations (default: divide_by_std).
+        n (int, optional): The number of perturbations to generate for each input row (default: 100).
+        perturbation_mean (float, optional): The mean of the perturbation distribution (default: 0).
+        perturbation_std (float, optional): The standard deviation of the perturbation distribution (default: None, uses input variable's std).
+        dropna (bool, optional): Whether to drop rows with NaN values in the results (default: True).
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the results of the sensitivity analysis, including unperturbed and perturbed inputs and outputs.
+
+    The returned DataFrame includes the following columns:
+        - "input_variable": The name of the input variable.
+        - "output_variable": The name of the output variable.
+        - "input_unperturbed": The unperturbed input values.
+        - "input_perturbation": The perturbations applied to the input.
+        - "input_perturbation_std": The normalized input perturbations.
+        - "input_perturbed": The perturbed input values.
+        - "output_unperturbed": The unperturbed output values.
+        - "output_perturbation": The perturbations observed in the output.
+        - "output_perturbation_std": The normalized output perturbations.
+        - "output_perturbed": The perturbed output values.
+    """
     # calculate standard deviation of the input variable
     input_std = np.nanstd(input_df[input_variable])
 
@@ -66,8 +96,6 @@ def perturbed_run(
     perturbed_output = perturbed_output_df[output_variable]
     # calculate output perturbation
     output_perturbation = perturbed_output - unperturbed_output
-
-    # output_perturbation_std = output_perturbation / output_std
 
     # normalize output perturbations
     output_perturbation_std = normalization_function(output_perturbation, unperturbed_output)

@@ -17,6 +17,25 @@ def sensitivity_analysis(
         n: int = 100,
         perturbation_mean: float = 0,
         perturbation_std: float = None) -> Tuple[pd.DataFrame, Dict]:
+    """
+    Perform sensitivity analysis by perturbing input variables and observing the effect on output variables.
+
+    Args:
+        input_df (pd.DataFrame): The input data as a pandas DataFrame.
+        input_variables (str): List of input variable names to perturb.
+        output_variables (str): List of output variable names to analyze.
+        forward_process (Callable): A function that processes the input data and produces output data.
+        perturbation_process (Callable, optional): A function to generate perturbations. Defaults to np.random.normal.
+        normalization_function (Callable, optional): A function to normalize the data. Defaults to default_normalization_function.
+        n (int, optional): Number of perturbations to generate. Defaults to 100.
+        perturbation_mean (float, optional): Mean of the perturbation distribution. Defaults to 0.
+        perturbation_std (float, optional): Standard deviation of the perturbation distribution. Defaults to None.
+
+    Returns:
+        Tuple[pd.DataFrame, Dict]: A tuple containing:
+            - perturbation_df (pd.DataFrame): A DataFrame with details of the perturbations and their effects.
+            - sensitivity_metrics_df (pd.DataFrame): A DataFrame with sensitivity metrics such as correlation, R², and mean normalized change.
+    """
     # print(len(input_df))
 
     for input_variable in input_variables:

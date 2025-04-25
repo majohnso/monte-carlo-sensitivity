@@ -15,6 +15,30 @@ def joint_perturbed_run(
         n: int = 100,
         perturbation_mean: float = None,
         perturbation_cov: float = None) -> pd.DataFrame:
+    """
+    Perform a joint perturbed run analysis on input data to evaluate the sensitivity of output variables
+    to perturbations in input variables.
+
+    Parameters:
+        input_df (pd.DataFrame): The input DataFrame containing the input variables.
+        input_variable (str): The name(s) of the input variable(s) to perturb.
+        output_variable (str): The name(s) of the output variable(s) to analyze.
+        forward_process (Callable): A function that processes the input DataFrame and returns a DataFrame
+                                    with output variables.
+        perturbation_process (Callable, optional): A function to generate perturbations. Defaults to
+                                                   np.random.multivariate_normal.
+        n (int, optional): The number of perturbations to generate for each input. Defaults to 100.
+        perturbation_mean (float, optional): The mean of the perturbation distribution. Defaults to None,
+                                             which assumes zero mean.
+        perturbation_cov (float, optional): The covariance matrix of the perturbation distribution. Defaults
+                                            to None, which assumes diagonal covariance based on input standard
+                                            deviations.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the unperturbed inputs, perturbed inputs, perturbations,
+                      unperturbed outputs, perturbed outputs, and standardized perturbations for both inputs
+                      and outputs.
+    """
     # calculate standard deviation of the input variable
 
     n_input = len(input_variable)
